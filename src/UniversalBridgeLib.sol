@@ -52,7 +52,7 @@ library UniversalBridgeLib {
     /// @param recipient the message recipient on the target chain
     /// @param data the calldata the recipient will be called with
     /// @param gasLimit the gas limit of the call to the recipient
-    function sendMessage(uint256 chainId, address recipient, bytes calldata data, uint256 gasLimit) internal {
+    function sendMessage(uint256 chainId, address recipient, bytes memory data, uint256 gasLimit) internal {
         sendMessage(chainId, recipient, data, gasLimit, DEFAULT_MAX_FEE_PER_GAS);
     }
 
@@ -64,13 +64,9 @@ library UniversalBridgeLib {
     /// @param data the calldata the recipient will be called with
     /// @param gasLimit the gas limit of the call to the recipient
     /// @param maxFeePerGas the max gas price used, only relevant for some chains (e.g. Arbitrum)
-    function sendMessage(
-        uint256 chainId,
-        address recipient,
-        bytes calldata data,
-        uint256 gasLimit,
-        uint256 maxFeePerGas
-    ) internal {
+    function sendMessage(uint256 chainId, address recipient, bytes memory data, uint256 gasLimit, uint256 maxFeePerGas)
+        internal
+    {
         if (chainId == CHAINID_ARBITRUM) _sendMessageArbitrum(recipient, data, gasLimit, maxFeePerGas);
         else if (chainId == CHAINID_OPTIMISM) _sendMessageOptimism(recipient, data, gasLimit);
         else if (chainId == CHAINID_POLYGON) _sendMessagePolygon(recipient, data);
@@ -115,7 +111,7 @@ library UniversalBridgeLib {
     /// Internal helpers for sending message to different chains
     /// -----------------------------------------------------------------------
 
-    function _sendMessageArbitrum(address recipient, bytes calldata data, uint256 gasLimit, uint256 maxFeePerGas)
+    function _sendMessageArbitrum(address recipient, bytes memory data, uint256 gasLimit, uint256 maxFeePerGas)
         internal
     {
         uint256 submissionCost = BRIDGE_ARBITRUM.calculateRetryableSubmissionFee(data.length, block.basefee);
@@ -125,18 +121,18 @@ library UniversalBridgeLib {
         );
     }
 
-    function _sendMessageOptimism(address recipient, bytes calldata data, uint256 gasLimit) internal {
+    function _sendMessageOptimism(address recipient, bytes memory data, uint256 gasLimit) internal {
         if (msg.value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
         if (gasLimit > type(uint32).max) revert UniversalBridgeLib__GasLimitTooLarge();
         BRIDGE_OPTIMISM.sendMessage(recipient, data, uint32(gasLimit));
     }
 
-    function _sendMessagePolygon(address recipient, bytes calldata data) internal {
+    function _sendMessagePolygon(address recipient, bytes memory data) internal {
         if (msg.value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
         BRIDGE_POLYGON.sendMessageToChild(recipient, data);
     }
 
-    function _sendMessageAMB(ArbitraryMessageBridge bridge, address recipient, bytes calldata data, uint256 gasLimit)
+    function _sendMessageAMB(ArbitraryMessageBridge bridge, address recipient, bytes memory data, uint256 gasLimit)
         internal
     {
         if (msg.value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
