@@ -5,7 +5,7 @@ import "../../src/UniversalBridgeLib.sol";
 
 contract MockBridge {
     function sendMessage(uint256 chainId, address recipient, bytes calldata data, uint256 gasLimit) external payable {
-        UniversalBridgeLib.sendMessage(chainId, recipient, data, gasLimit);
+        UniversalBridgeLib.sendMessage(chainId, recipient, data, gasLimit, msg.value);
     }
 
     function sendMessage(
@@ -15,7 +15,7 @@ contract MockBridge {
         uint256 gasLimit,
         uint256 maxFeePerGas
     ) external payable {
-        UniversalBridgeLib.sendMessage(chainId, recipient, data, gasLimit, maxFeePerGas);
+        UniversalBridgeLib.sendMessage(chainId, recipient, data, gasLimit, msg.value, maxFeePerGas);
     }
 
     function getRequiredMessageValue(uint256 chainId, uint256 dataLength, uint256 gasLimit)

@@ -22,7 +22,7 @@ bytes memory data = "Hello world";
 uint256 gasLimit = 1e6;
 
 uint256 requiredValue = UniversalBridgeLib.getRequiredMessageValue(UniversalBridgeLib.CHAINID_ARBITRUM, data.length, gasLimit);
-UniversalBridgeLib.sendMessage(UniversalBridgeLib.CHAINID_ARBITRUM, recipient, data, gasLimit);
+UniversalBridgeLib.sendMessage(UniversalBridgeLib.CHAINID_ARBITRUM, recipient, data, gasLimit, requiredValue);
 ```
 
 Contracts on the receiving end of the message should have cross-chain support, which can be done by inheriting from the corresponding [OpenZeppelin Cross Chain Awareness](https://docs.openzeppelin.com/contracts/4.x/api/crosschain) specialization contract.

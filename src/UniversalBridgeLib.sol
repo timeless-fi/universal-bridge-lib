@@ -52,8 +52,11 @@ library UniversalBridgeLib {
     /// @param recipient the message recipient on the target chain
     /// @param data the calldata the recipient will be called with
     /// @param gasLimit the gas limit of the call to the recipient
-    function sendMessage(uint256 chainId, address recipient, bytes memory data, uint256 gasLimit) internal {
-        sendMessage(chainId, recipient, data, gasLimit, DEFAULT_MAX_FEE_PER_GAS);
+    /// @param value the amount of ETH to send along with the message (only supported by Arbitrum)
+    function sendMessage(uint256 chainId, address recipient, bytes memory data, uint256 gasLimit, uint256 value)
+        internal
+    {
+        sendMessage(chainId, recipient, data, gasLimit, value, DEFAULT_MAX_FEE_PER_GAS);
     }
 
     /// @notice Sends message to recipient on target chain with the given calldata.
@@ -63,11 +66,17 @@ library UniversalBridgeLib {
     /// @param recipient the message recipient on the target chain
     /// @param data the calldata the recipient will be called with
     /// @param gasLimit the gas limit of the call to the recipient
+    /// @param value the amount of ETH to send along with the message (only supported by Arbitrum)
     /// @param maxFeePerGas the max gas price used, only relevant for some chains (e.g. Arbitrum)
-    function sendMessage(uint256 chainId, address recipient, bytes memory data, uint256 gasLimit, uint256 maxFeePerGas)
-        internal
-    {
-        if (chainId == CHAINID_ARBITRUM) _sendMessageArbitrum(recipient, data, gasLimit, maxFeePerGas);
+    function sendMessage(
+        uint256 chainId,
+        address recipient,
+        bytes memory data,
+        uint256 gasLimit,
+        uint256 value,
+        uint256 maxFeePerGas
+    ) internal {
+        if (chainId == CHAINID_ARBITRUM) _sendMessageArbitrum(recipient, data, gasLimit, value, maxFeePerGas);
         else if (chainId == CHAINID_OPTIMISM) _sendMessageOptimism(recipient, data, gasLimit);
         else if (chainId == CHAINID_POLYGON) _sendMessagePolygon(recipient, data);
         else if (chainId == CHAINID_BSC) _sendMessageAMB(BRIDGE_BSC, recipient, data, gasLimit);
@@ -111,12 +120,16 @@ library UniversalBridgeLib {
     /// Internal helpers for sending message to different chains
     /// -----------------------------------------------------------------------
 
-    function _sendMessageArbitrum(address recipient, bytes memory data, uint256 gasLimit, uint256 maxFeePerGas)
-        internal
-    {
+    function _sendMessageArbitrum(
+        address recipient,
+        bytes memory data,
+        uint256 gasLimit,
+        uint256 value,
+        uint256 maxFeePerGas
+    ) internal {
         uint256 submissionCost = BRIDGE_ARBITRUM.calculateRetryableSubmissionFee(data.length, block.basefee);
-        uint256 l2CallValue = msg.value - submissionCost - gasLimit * maxFeePerGas;
-        BRIDGE_ARBITRUM.createRetryableTicket{value: msg.value}(
+        uint256 l2CallValue = value - submissionCost - gasLimit * maxFeePerGas;
+        BRIDGE_ARBITRUM.createRetryableTicket{value: value}(
             recipient, l2CallValue, submissionCost, msg.sender, msg.sender, gasLimit, maxFeePerGas, data
         );
     }
