@@ -77,10 +77,10 @@ library UniversalBridgeLib {
         uint256 maxFeePerGas
     ) internal {
         if (chainId == CHAINID_ARBITRUM) _sendMessageArbitrum(recipient, data, gasLimit, value, maxFeePerGas);
-        else if (chainId == CHAINID_OPTIMISM) _sendMessageOptimism(recipient, data, gasLimit);
-        else if (chainId == CHAINID_POLYGON) _sendMessagePolygon(recipient, data);
-        else if (chainId == CHAINID_BSC) _sendMessageAMB(BRIDGE_BSC, recipient, data, gasLimit);
-        else if (chainId == CHAINID_GNOSIS) _sendMessageAMB(BRIDGE_GNOSIS, recipient, data, gasLimit);
+        else if (chainId == CHAINID_OPTIMISM) _sendMessageOptimism(recipient, data, gasLimit, value);
+        else if (chainId == CHAINID_POLYGON) _sendMessagePolygon(recipient, data, value);
+        else if (chainId == CHAINID_BSC) _sendMessageAMB(BRIDGE_BSC, recipient, data, gasLimit, value);
+        else if (chainId == CHAINID_GNOSIS) _sendMessageAMB(BRIDGE_GNOSIS, recipient, data, gasLimit, value);
         else revert UniversalBridgeLib__ChainIdNotSupported();
     }
 
@@ -134,21 +134,25 @@ library UniversalBridgeLib {
         );
     }
 
-    function _sendMessageOptimism(address recipient, bytes memory data, uint256 gasLimit) internal {
-        if (msg.value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
+    function _sendMessageOptimism(address recipient, bytes memory data, uint256 gasLimit, uint256 value) internal {
+        if (value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
         if (gasLimit > type(uint32).max) revert UniversalBridgeLib__GasLimitTooLarge();
         BRIDGE_OPTIMISM.sendMessage(recipient, data, uint32(gasLimit));
     }
 
-    function _sendMessagePolygon(address recipient, bytes memory data) internal {
-        if (msg.value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
+    function _sendMessagePolygon(address recipient, bytes memory data, uint256 value) internal {
+        if (value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
         BRIDGE_POLYGON.sendMessageToChild(recipient, data);
     }
 
-    function _sendMessageAMB(ArbitraryMessageBridge bridge, address recipient, bytes memory data, uint256 gasLimit)
-        internal
-    {
-        if (msg.value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
+    function _sendMessageAMB(
+        ArbitraryMessageBridge bridge,
+        address recipient,
+        bytes memory data,
+        uint256 gasLimit,
+        uint256 value
+    ) internal {
+        if (value != 0) revert UniversalBridgeLib__MsgValueNotSupported();
         if (gasLimit > bridge.maxGasPerTx()) revert UniversalBridgeLib__GasLimitTooLarge();
         bridge.requireToPassMessage(recipient, data, gasLimit);
     }
