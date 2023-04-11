@@ -24,19 +24,23 @@ contract UniversalBridgeLibTest is Test {
     }
 
     function test_sendMessageOptimism(address recipient, bytes calldata data) external {
-        bridge.sendMessage(CHAINID_OPTIMISM, recipient, data, 1e6);
+        uint256 requiredValue = bridge.getRequiredMessageValue(CHAINID_OPTIMISM, data.length, 1e6);
+        bridge.sendMessage{value: requiredValue}(CHAINID_OPTIMISM, recipient, data, 1e6);
     }
 
     function test_sendMessagePolygon(address recipient, bytes calldata data) external {
-        bridge.sendMessage(CHAINID_POLYGON, recipient, data, 1e6);
+        uint256 requiredValue = bridge.getRequiredMessageValue(CHAINID_POLYGON, data.length, 1e6);
+        bridge.sendMessage{value: requiredValue}(CHAINID_POLYGON, recipient, data, 1e6);
     }
 
     function test_sendMessageBSC(address recipient, bytes calldata data) external {
-        bridge.sendMessage(CHAINID_BSC, recipient, data, 1e6);
+        uint256 requiredValue = bridge.getRequiredMessageValue(CHAINID_BSC, data.length, 1e6);
+        bridge.sendMessage{value: requiredValue}(CHAINID_BSC, recipient, data, 1e6);
     }
 
     function test_sendMessageGnosis(address recipient, bytes calldata data) external {
-        bridge.sendMessage(CHAINID_GNOSIS, recipient, data, 1e6);
+        uint256 requiredValue = bridge.getRequiredMessageValue(CHAINID_GNOSIS, data.length, 1e6);
+        bridge.sendMessage{value: requiredValue}(CHAINID_GNOSIS, recipient, data, 1e6);
     }
 
     /// -----------------------------------------------------------------------
