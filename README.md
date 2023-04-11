@@ -1,5 +1,7 @@
 # UniversalBridgeLib
 
+[![codecov](https://codecov.io/gh/timeless-fi/universal-bridge-lib/branch/main/graph/badge.svg?token=19LGPZN9Y5)](https://codecov.io/gh/timeless-fi/universal-bridge-lib)
+
 Unified library for sending messages from Ethereum to other chains and rollups.
 
 It is essentially a quality-of-life wrapper around official bridges to make the developer experience simpler while maintaining the same security assumptions as the official bridges. This makes it much more secure than "omnichain" solutions like LayerZero, at least for rollups like Arbitrum and Optimism where the official bridge has the same security assumptions as the network itself. Of course, UniversalBridgeLib only supports one-way messaging from Ethereum to other networks, so it is less capable than "omnichain" solutions, but it is still useful for use cases like cross-chain governance.
